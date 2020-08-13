@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "servertick",
+  "version": "${version}",
+  "name": "ServerTick",
+  "description": "Makes the F3 TPS graph work on dedicated servers",
+  "authors": [
+    "sammko"
+  ],
+  "contact": {
+    "homepage": "https://github.com/sammko/servertick-fabric",
+    "issues": "https://github.com/sammko/servertick-fabric/issues",
+    "email": "samuel@cavoj.net"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "server": [
+      "net.cavoj.servertick.STServer"
+    ],
+    "client": [
+      "net.cavoj.servertick.STClient"
+    ]
+  },
+  "mixins": [
+      "servertick.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "1.16.x"
+  }
+}

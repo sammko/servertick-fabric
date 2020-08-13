@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.cavoj.servertick.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "client.ClientPlayNetworkHandlerMixin",
+    "client.DebugHudMixin",
+    "client.KeyboardMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "MetricsDataMixin"
+  ],
+  "server": [
+    "server.MetricsDataServerMixin",
+    "server.MinecraftServerAccessor",
+    "server.ServerPlayNetworkHandlerMixin"
+  ]
+}
