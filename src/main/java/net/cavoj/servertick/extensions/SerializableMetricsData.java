@@ -1,4 +1,4 @@
-package net.cavoj.servertick;
+package net.cavoj.servertick.extensions;
 
 import net.minecraft.network.PacketByteBuf;
 

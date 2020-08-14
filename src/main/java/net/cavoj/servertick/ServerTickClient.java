@@ -1,30 +1,30 @@
 package net.cavoj.servertick;
 
-import io.netty.buffer.Unpooled;
+import net.cavoj.servertick.extensions.SerializableMetricsData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.MetricsData;
 
-public class STClient implements ClientModInitializer {
-    private static STClient _instance;
+public class ServerTickClient implements ClientModInitializer {
+    private static ServerTickClient _instance;
 
-    public STClient() {
+    public ServerTickClient() {
         if (_instance != null) {
             throw new RuntimeException("Cannot have multiple instances");
         }
         _instance = this;
     }
 
-    public static STClient getInstance() {
+    public static ServerTickClient getInstance() {
         return _instance;
     }
 
     @Override
     public void onInitializeClient() {
-        ClientSidePacketRegistry.INSTANCE.register(Packets.PACKET_FULL_METRICS, this::processMetricsFullPacket);
-        ClientSidePacketRegistry.INSTANCE.register(Packets.PACKET_SAMPLE_METRICS, this::processMetricsSamplePacket);
+        ClientSidePacketRegistry.INSTANCE.register(NetworkS2C.PACKET_FULL_METRICS, this::processMetricsFullPacket);
+        ClientSidePacketRegistry.INSTANCE.register(NetworkS2C.PACKET_LAST_SAMPLE, this::processMetricsSamplePacket);
     }
 
     private void processMetricsFullPacket(PacketContext ctx, PacketByteBuf data) {
@@ -47,15 +47,13 @@ public class STClient implements ClientModInitializer {
 
     public void setTpsEnabled(boolean enabled) {
         if (this.debugTpsEnabled != enabled) {
+            if (enabled) {
+                // To prevent displaying stale data
+                setMetricsData(null);
+            }
             this.debugTpsEnabled = enabled;
-            updateTpsEnabled();
+            NetworkC2S.sendToggle(enabled);
         }
-    }
-
-    private void updateTpsEnabled() {
-        PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-        data.writeBoolean(this.debugTpsEnabled);
-        ClientSidePacketRegistry.INSTANCE.sendToServer(Packets.PACKET_TOGGLE_DEBUG_SCREEN, data);
     }
 
     public void setMetricsData(MetricsData data) {

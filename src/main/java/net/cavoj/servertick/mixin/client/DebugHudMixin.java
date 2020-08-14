@@ -1,6 +1,6 @@
 package net.cavoj.servertick.mixin.client;
 
-import net.cavoj.servertick.STClient;
+import net.cavoj.servertick.ServerTickClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.util.math.MatrixStack;
@@ -21,7 +21,7 @@ public abstract class DebugHudMixin {
     @Inject(method = "render", at = @At("HEAD"))
     public void render(MatrixStack matrices, CallbackInfo ci) {
         if (this.client.options.debugTpsEnabled && this.client.getServer() == null) {
-            MetricsData metrics = STClient.getInstance().getMetricsData();
+            MetricsData metrics = ServerTickClient.getInstance().getMetricsData();
             if (metrics == null) return;
 
             int i = this.client.getWindow().getScaledWidth();

@@ -1,7 +1,7 @@
 package net.cavoj.servertick.mixin;
 
-import net.cavoj.servertick.STServer;
-import net.cavoj.servertick.SerializableMetricsData;
+import net.cavoj.servertick.extensions.LastSampleMetricsData;
+import net.cavoj.servertick.extensions.SerializableMetricsData;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.MetricsData;
 import org.spongepowered.asm.mixin.Final;
@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MetricsData.class)
-public abstract class MetricsDataMixin implements SerializableMetricsData {
+public abstract class MetricsDataMixin implements SerializableMetricsData, LastSampleMetricsData {
+
+    private long lastSample;
 
     @Shadow @Final private long[] samples;
 
@@ -40,4 +42,13 @@ public abstract class MetricsDataMixin implements SerializableMetricsData {
             data.writeLong(this.samples[i]);
     }
 
+    @Inject(method = "pushSample", at = @At("HEAD"))
+    public void pushSample(long sample, CallbackInfo ci) {
+        this.lastSample = sample;
+    }
+
+    @Override
+    public long getLastSample() {
+        return this.lastSample;
+    }
 }

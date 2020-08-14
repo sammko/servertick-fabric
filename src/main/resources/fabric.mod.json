@@ -15,11 +15,11 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "server": [
-      "net.cavoj.servertick.STServer"
+    "main": [
+      "net.cavoj.servertick.ServerTick"
     ],
     "client": [
-      "net.cavoj.servertick.STClient"
+      "net.cavoj.servertick.ServerTickClient"
     ]
   },
   "mixins": [

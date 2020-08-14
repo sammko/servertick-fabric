@@ -1,6 +1,6 @@
 package net.cavoj.servertick.mixin.client;
 
-import net.cavoj.servertick.STClient;
+import net.cavoj.servertick.ServerTickClient;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Final;
@@ -16,6 +16,7 @@ public abstract class KeyboardMixin {
 
     @Inject(method = "onKey", at = @At("RETURN"))
     protected void onKey(CallbackInfo ci) {
-        STClient.getInstance().setTpsEnabled(this.client.options.debugEnabled && this.client.options.debugTpsEnabled);
+        if (this.client.getServer() != null) return; // Do nothing when playing on integrated
+        ServerTickClient.getInstance().setTpsEnabled(this.client.options.debugEnabled && this.client.options.debugTpsEnabled);
     }
 }

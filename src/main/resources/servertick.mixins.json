@@ -12,11 +12,8 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "MetricsDataMixin"
-  ],
-  "server": [
-    "server.MetricsDataServerMixin",
-    "server.MinecraftServerAccessor",
-    "server.ServerPlayNetworkHandlerMixin"
+    "MetricsDataMixin",
+    "MinecraftServerMixin",
+    "ServerPlayNetworkHandlerMixin"
   ]
 }
