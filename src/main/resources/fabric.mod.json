@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "servertick",
   "version": "${version}",
-  "name": "ServerTick",
+  "name": "Server Tick",
   "description": "Makes the F3 TPS graph work on dedicated servers",
   "authors": [
     "sammko"
@@ -13,6 +13,7 @@
     "email": "samuel@cavoj.net"
   },
   "license": "MIT",
+  "icon": "assets/servertick/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
