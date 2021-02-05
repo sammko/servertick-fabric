@@ -7,18 +7,21 @@ import net.cavoj.servertick.extensions.MinecraftServerWithST;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.network.PacketContext;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ServerTick implements ModInitializer {
     private ConfigHolder<ModConfig> configHolder;
 
     @Override
     public void onInitialize() {
-        ServerSidePacketRegistry.INSTANCE.register(NetworkC2S.PACKET_ENABLED, this::processTogglePacket);
+        ServerPlayNetworking.registerGlobalReceiver(NetworkC2S.PACKET_ENABLED, this::processTogglePacket);
         ServerTickEvents.END_SERVER_TICK.register((minecraftServer -> {
             ((MinecraftServerWithST)minecraftServer).tickST();
         }));
@@ -34,18 +37,16 @@ public class ServerTick implements ModInitializer {
                player.hasPermissionLevel(4);
     }
 
-    private void processTogglePacket(PacketContext ctx, PacketByteBuf data) {
-        boolean state = data.readBoolean();
-        ctx.getTaskQueue().execute(() -> {
-            PlayerEntity player = ctx.getPlayer();
-            MinecraftServerWithST server = (MinecraftServerWithST)ctx.getPlayer().getServer();
-            assert server != null;
+    private void processTogglePacket(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender sender) {
+        boolean state = buf.readBoolean();
+        server.execute(() -> {
+            MinecraftServerWithST serverST = (MinecraftServerWithST)server;
             if (state) {
                 if (checkPlayerPrivilege(player)) {
-                    server.registerSTListener(player);
+                    serverST.registerSTListener(player);
                 }
             } else {
-                server.removeSTListener(player);
+                serverST.removeSTListener(player);
             }
         });
     }

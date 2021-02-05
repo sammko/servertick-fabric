@@ -1,9 +1,9 @@
 package net.cavoj.servertick.extensions;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface MinecraftServerWithST {
-    void registerSTListener(PlayerEntity player);
-    void removeSTListener(PlayerEntity player);
+    void registerSTListener(ServerPlayerEntity player);
+    void removeSTListener(ServerPlayerEntity player);
     void tickST();
 }

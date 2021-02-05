@@ -1,5 +1,6 @@
 package net.cavoj.servertick.mixin;
 
+import io.netty.buffer.ByteBuf;
 import net.cavoj.servertick.extensions.LastSampleMetricsData;
 import net.cavoj.servertick.extensions.SerializableMetricsData;
 import net.minecraft.network.PacketByteBuf;
@@ -25,7 +26,7 @@ public abstract class MetricsDataMixin implements SerializableMetricsData, LastS
     @Shadow private int startIndex;
 
     @Override
-    public void deserialize(PacketByteBuf data) {
+    public void deserialize(ByteBuf data) {
         this.writeIndex = data.readInt();
         this.sampleCount = data.readInt();
         this.startIndex = data.readInt();

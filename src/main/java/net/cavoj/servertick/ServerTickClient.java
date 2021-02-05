@@ -1,10 +1,9 @@
 package net.cavoj.servertick;
 
+import io.netty.buffer.ByteBuf;
 import net.cavoj.servertick.extensions.SerializableMetricsData;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.MetricsData;
 
 public class ServerTickClient implements ClientModInitializer {
@@ -23,22 +22,20 @@ public class ServerTickClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientSidePacketRegistry.INSTANCE.register(NetworkS2C.PACKET_FULL_METRICS, this::processMetricsFullPacket);
-        ClientSidePacketRegistry.INSTANCE.register(NetworkS2C.PACKET_LAST_SAMPLE, this::processMetricsSamplePacket);
-    }
-
-    private void processMetricsFullPacket(PacketContext ctx, PacketByteBuf data) {
-        // not sure if I can do this on the network thread
-        if (this.metrics == null)
-            this.metrics = new MetricsData();
-        ((SerializableMetricsData)this.metrics).deserialize(data);
-    }
-
-    private void processMetricsSamplePacket(PacketContext ctx, PacketByteBuf data) {
-        long time = data.readLong();
-        ctx.getTaskQueue().execute(() -> {
-            if (this.metrics != null)
-                this.metrics.pushSample(time);
+        ClientPlayNetworking.registerGlobalReceiver(NetworkS2C.PACKET_FULL_METRICS, (client, handler, buf, responseSender) -> {
+            ByteBuf bufcopy = buf.copy();
+            client.execute(() -> {
+                if (this.metrics == null)
+                    this.metrics = new MetricsData();
+                ((SerializableMetricsData)this.metrics).deserialize(bufcopy);
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(NetworkS2C.PACKET_LAST_SAMPLE, (client, handler, buf, responseSender) -> {
+            long time = buf.readLong();
+            client.execute(() -> {
+                if (this.metrics != null)
+                    this.metrics.pushSample(time);
+            });
         });
     }
 
