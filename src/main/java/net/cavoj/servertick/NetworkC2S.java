@@ -11,6 +11,7 @@ public class NetworkC2S {
     public static void sendToggle(boolean state) {
         PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
         data.writeBoolean(state);
-        ClientPlayNetworking.send(PACKET_ENABLED, data);
+        if (ClientPlayNetworking.canSend(PACKET_ENABLED))
+            ClientPlayNetworking.send(PACKET_ENABLED, data);
     }
 }
