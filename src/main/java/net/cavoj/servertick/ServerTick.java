@@ -13,7 +13,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import java.nio.file.Path;
+
 public class ServerTick implements ModInitializer {
+    private Config config;
+
     @Override
     public void onInitialize() {
         ServerPlayNetworking.registerGlobalReceiver(NetworkC2S.PACKET_ENABLED, this::processTogglePacket);
@@ -21,13 +25,14 @@ public class ServerTick implements ModInitializer {
             ((MinecraftServerWithST)minecraftServer).tickST();
         }));
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
-            // TODO Load server config
+            Path configFilePath = FabricLoader.getInstance().getConfigDir().resolve("servertick.toml");
+            this.config = new Config(configFilePath);
         }
     }
 
     private boolean checkPlayerPrivilege(PlayerEntity player) {
-        // TODO check server config
         return (player.getServer() != null && !player.getServer().isDedicated()) ||
+               (this.config != null && !this.config.requireOP) ||
                player.hasPermissionLevel(4);
     }
 

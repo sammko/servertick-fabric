@@ -17,6 +17,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	implementation "com.moandjiezana.toml:toml4j:${project.toml4j_version}"
+	include "com.moandjiezana.toml:toml4j:${project.toml4j_version}"
 }
 
 processResources {
@@ -35,7 +38,7 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
 	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+	it.options.release.set(16)
 }
 
 java {
@@ -62,14 +65,4 @@ publishing {
 			}
 		}
 	}
-//
-//	repositories {
-//		maven {
-//			url = mavenUrl
-//			credentials {
-//				username mavenUser
-//				password mavenPassword
-//			}
-//		}
-//	}
 }
