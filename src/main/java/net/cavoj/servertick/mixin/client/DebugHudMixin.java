@@ -24,10 +24,8 @@ public abstract class DebugHudMixin {
             MetricsData metrics = ServerTickClient.getInstance().getMetricsData();
             if (metrics == null) return;
 
-            context.draw(() -> {
-                int i = this.client.getWindow().getScaledWidth();
-                this.drawMetricsData(context, metrics, i - Math.min(i / 2, 240), i / 2, false);
-            });
+            int width = this.client.getWindow().getScaledWidth();
+            this.drawMetricsData(context, metrics, width - Math.min(width / 2, 240), width / 2, false);
         }
     }
 }
