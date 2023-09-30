@@ -1,13 +1,20 @@
 package net.cavoj.servertick;
 
 import io.netty.buffer.ByteBuf;
-import net.cavoj.servertick.extensions.SerializableMetricsData;
+import net.cavoj.servertick.extensions.SerializablePerformanceLog;
+import net.cavoj.servertick.mixin.client.DebugHudAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.util.MetricsData;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.profiler.PerformanceLog;
+
+import java.util.Optional;
 
 public class ServerTickClient implements ClientModInitializer {
     private static ServerTickClient _instance;
+    private boolean debugTpsEnabled;
+
+    private boolean serverResponded;
 
     public ServerTickClient() {
         if (_instance != null) {
@@ -20,49 +27,45 @@ public class ServerTickClient implements ClientModInitializer {
         return _instance;
     }
 
+    public boolean getServerResponded() {
+        return serverResponded;
+    }
+
+    private Optional<PerformanceLog> getPerfLog() {
+        if (MinecraftClient.getInstance().inGameHud != null) {
+            return Optional.of(((DebugHudAccessor) MinecraftClient.getInstance().getDebugHud()).getTickNanosLog());
+        }
+        return Optional.empty();
+    }
+
     @Override
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(NetworkS2C.PACKET_FULL_METRICS, (client, handler, buf, responseSender) -> {
+            serverResponded = true;
             ByteBuf bufcopy = buf.copy();
-            client.execute(() -> {
-                if (this.metrics == null)
-                    this.metrics = new MetricsData();
-                ((SerializableMetricsData)this.metrics).deserialize(bufcopy);
-            });
+            client.execute(() -> getPerfLog().ifPresent(log -> ((SerializablePerformanceLog) log).servertick$deserialize(bufcopy)));
         });
         ClientPlayNetworking.registerGlobalReceiver(NetworkS2C.PACKET_LAST_SAMPLE, (client, handler, buf, responseSender) -> {
             long time = buf.readLong();
-            client.execute(() -> {
-                if (this.metrics != null)
-                    this.metrics.pushSample(time);
-            });
+            client.execute(() -> getPerfLog().ifPresent(log -> log.push(time)));
         });
-    }
 
-    private boolean debugTpsEnabled;
-    private MetricsData metrics;
+    }
 
     public void setTpsEnabled(boolean enabled) {
         if (this.debugTpsEnabled != enabled) {
             if (enabled) {
-                // To prevent displaying stale data
-                setMetricsData(null);
+                getPerfLog().ifPresent(PerformanceLog::reset);
+                serverResponded = false;
             }
             this.debugTpsEnabled = enabled;
-            NetworkC2S.sendToggle(enabled);
+            NetworkC2S.sendEnabled(enabled);
         }
     }
 
-    public void setMetricsData(MetricsData data) {
-        this.metrics = data;
-    }
-
-    public MetricsData getMetricsData() {
-        return this.metrics;
-    }
-
     public void joined() {
-        setMetricsData(null);
+        getPerfLog().ifPresent(PerformanceLog::reset);
+        serverResponded = false;
         setTpsEnabled(false);
     }
 }

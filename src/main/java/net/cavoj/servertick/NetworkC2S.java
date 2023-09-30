@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 public class NetworkC2S {
     public static final Identifier PACKET_ENABLED = new Identifier("servertick", "enabled");
 
-    public static void sendToggle(boolean state) {
+    public static void sendEnabled(boolean state) {
         PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
         data.writeBoolean(state);
         if (ClientPlayNetworking.canSend(PACKET_ENABLED))

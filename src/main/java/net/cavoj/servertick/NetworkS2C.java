@@ -1,7 +1,7 @@
 package net.cavoj.servertick;
 
 import io.netty.buffer.Unpooled;
-import net.cavoj.servertick.extensions.SerializableMetricsData;
+import net.cavoj.servertick.extensions.SerializablePerformanceLog;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -11,9 +11,9 @@ public class NetworkS2C {
     public static final Identifier PACKET_FULL_METRICS = new Identifier("servertick", "metrics/full");
     public static final Identifier PACKET_LAST_SAMPLE = new Identifier("servertick", "metrics/sample");
 
-    public static void sendFullMetrics(SerializableMetricsData metrics, ServerPlayerEntity player) {
+    public static void sendFull(SerializablePerformanceLog perfLog, ServerPlayerEntity player) {
         PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-        metrics.serialize(data);
+        perfLog.servertick$serialize(data);
         ServerPlayNetworking.send(player, PACKET_FULL_METRICS, data);
     }
 

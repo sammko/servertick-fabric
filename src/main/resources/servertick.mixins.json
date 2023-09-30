@@ -5,15 +5,16 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "client.ClientPlayNetworkHandlerMixin",
-    "client.DebugHudMixin",
-    "client.KeyboardMixin"
+    "client.DebugHudAccessor",
+    "client.DebugHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "MetricsDataMixin",
     "MinecraftServerMixin",
+    "PerformanceLogMixin",
+    "ServerCommonNetworkHandlerAccessor",
     "ServerPlayNetworkHandlerMixin"
   ]
 }
