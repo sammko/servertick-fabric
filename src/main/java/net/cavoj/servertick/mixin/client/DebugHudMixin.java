@@ -24,7 +24,7 @@ public abstract class DebugHudMixin {
 
     @Shadow private boolean showDebugHud;
 
-    @Inject(method = "render", at = @At(value = "HEAD"))
+    @Inject(method = "method_51746", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/hud/debug/RenderingChart.render(Lnet/minecraft/client/gui/DrawContext;II)V", ordinal = 0))
     private void render(DrawContext context, CallbackInfo ci) {
         if (this.client.getServer() == null &&
                 this.renderingAndTickChartsVisible &&
